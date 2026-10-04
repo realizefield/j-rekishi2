@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>歴史学習GAMBA — 単元一覧</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Meiryo", sans-serif; background: #f0f2f5; min-height: 100vh; padding: 24px 16px 60px; }
+  h1 { text-align: center; font-size: 26px; color: #1a1a2e; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 28px; }
+  .era-block { max-width: 860px; margin: 0 auto 28px; }
+  .era-title { font-size: 18px; font-weight: bold; color: #fff; background: #2c3e8c; padding: 10px 18px; border-radius: 10px 10px 0 0; display: flex; align-items: center; gap: 10px; }
+  .era-title .era-icon { font-size: 20px; }
+  .unit-grid { background: #fff; border: 1px solid #dde; border-top: none; border-radius: 0 0 10px 10px; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .unit-card { border: 1.5px solid #dde; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; position: relative; background: #fafafa; }
+  .unit-card:hover { border-color: #2c3e8c; background: #f0f4ff; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(44,62,140,0.1); }
+  .unit-card.done { border-color: #1976d2; background: #e8f1fd; box-shadow: 0 0 0 2px #90bef5; }
+  .unit-card.done:hover { background: #d0e6fb; }
+  .unit-card.done .unit-title { color: #1255a0; }
+  .unit-card.test-done { border-color: #0d47a1; background: #c8dffa; box-shadow: 0 0 0 3px #1976d2; }
+  .unit-card.test-done:hover { background: #aed0f7; }
+  .unit-card.test-done .unit-title { color: #0d3b7a; font-weight: bold; }
+  .unit-title { font-size: 15px; font-weight: bold; color: #1a1a2e; margin-bottom: 6px; padding-right: 30px; }
+  .unit-sub { font-size: 12px; color: #888; }
+  .badge-area { position: absolute; top: 10px; right: 12px; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: bold; }
+  .badge-done { background: #1976d2; color: #fff; }
+  .badge-test { background: #1565c0; color: #fff; }
+  .badge-score { background: #0d47a1; color: #fff; }
+  .score-badge { background: #2c3e8c; color: #fff; }
+  .unit-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .btn-small { padding: 5px 12px; border-radius: 6px; border: none; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.15s; }
+  .btn-study { background: #2c3e8c; color: #fff; }
+  .btn-study:hover { background: #1e2d6b; }
+  .btn-quiz { background: #27ae60; color: #fff; }
+  .btn-quiz:hover { background: #1e8a4d; }
+  .btn-test { background: #e67e22; color: #fff; }
+  .btn-test:hover { background: #c96a10; }
+  .progress-bar-wrap { max-width: 860px; margin: 0 auto 24px; background: #fff; border-radius: 10px; padding: 16px 20px; border: 1px solid #dde; }
+  .progress-label { font-size: 13px; color: #555; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .progress-bar { background: #eee; border-radius: 99px; height: 10px; overflow: hidden; }
+  .progress-fill { background: linear-gradient(90deg, #2c3e8c, #27ae60); height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+</style>
+</head>
+<body>
+
+<h1>📚 歴史学習 GAMBA</h1>
+<p class="subtitle">単元を選んで学習しよう！</p>
+
+<div class="progress-bar-wrap">
+  <div class="progress-label">
+    <span>学習進捗</span>
+    <span id="progress-text">0 / 0 単元完了</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+</div>
+
+<div id="unit-list"></div>
+
+<script>
+const UNITS = [
+ {
+  "era": "古代",
+  "icon": "🏛️",
+  "color": "#6d4c41",
+  "units": [
+   {
+    "id": "kodai1",
+    "title": "四大文明の誕生",
+    "sub": "古代",
+    "study": "kodai1.html",
+    "quiz": "kodai1_quiz.html",
+    "test": "kodai1_test.html"
+   },
+   {
+    "id": "kodai2",
+    "title": "中国統一とシルクロード",
+    "sub": "古代",
+    "study": "kodai2.html",
+    "quiz": "kodai2_quiz.html",
+    "test": "kodai2_test.html"
+   },
+   {
+    "id": "kodai3",
+    "title": "縄文・弥生・邪馬台国",
+    "sub": "古代",
+    "study": "kodai3.html",
+    "quiz": "kodai3_quiz.html",
+    "test": "kodai3_test.html"
+   },
+   {
+    "id": "kofun1",
+    "title": "古墳時代と大和政権",
+    "sub": "古代",
+    "study": "kofun1.html",
+    "quiz": "kofun1_quiz.html",
+    "test": "kofun1_test.html"
+   },
+   {
+    "id": "asuka1",
+    "title": "飛鳥時代・大化の改新",
+    "sub": "古代",
+    "study": "asuka1.html",
+    "quiz": "asuka1_quiz.html",
+    "test": "asuka1_test.html"
+   },
+   {
+    "id": "asuka2",
+    "title": "飛鳥文化",
+    "sub": "古代（文化）",
+    "study": "asuka2.html",
+    "quiz": "asuka2_quiz.html",
+    "test": "asuka2_test.html"
+   },
+   {
+    "id": "nara1",
+    "title": "奈良時代",
+    "sub": "古代",
+    "study": "nara1.html",
+    "quiz": "nara1_quiz.html",
+    "test": "nara1_test.html"
+   },
+   {
+    "id": "nara2",
+    "title": "天平文化",
+    "sub": "古代（文化）",
+    "study": "nara2.html",
+    "quiz": "nara2_quiz.html",
+    "test": "nara2_test.html"
+   }
+  ]
+ },
+ {
+  "era": "平安・鎌倉",
+  "icon": "🏯",
+  "color": "#1a5276",
+  "units": [
+   {
+    "id": "heian1",
+    "title": "平安時代①",
+    "sub": "平安時代",
+    "study": "heian1.html",
+    "quiz": "heian1_quiz.html",
+    "test": "heian1_test.html"
+   },
+   {
+    "id": "heian2",
+    "title": "平安時代②",
+    "sub": "平安時代",
+    "study": "heian2.html",
+    "quiz": "heian2_quiz.html",
+    "test": "heian2_test.html"
+   },
+   {
+    "id": "heian_bunka",
+    "title": "平安文化（国風文化）",
+    "sub": "平安時代（文化）",
+    "study": "heian_bunka.html",
+    "quiz": "heian_bunka_quiz.html",
+    "test": "heian_bunka_test.html"
+   },
+   {
+    "id": "kamakura1",
+    "title": "鎌倉幕府の成立",
+    "sub": "鎌倉時代",
+    "study": "kamakura1.html",
+    "quiz": "kamakura1_quiz.html",
+    "test": "kamakura1_test.html"
+   },
+   {
+    "id": "kamakura2",
+    "title": "元寇と鎌倉幕府の滅亡",
+    "sub": "鎌倉時代",
+    "study": "kamakura2.html",
+    "quiz": "kamakura2_quiz.html",
+    "test": "kamakura2_test.html"
+   },
+   {
+    "id": "kamakura_bunka",
+    "title": "鎌倉文化",
+    "sub": "鎌倉時代（文化）",
+    "study": "kamakura_bunka.html",
+    "quiz": "kamakura_bunka_quiz.html",
+    "test": "kamakura_bunka_test.html"
+   }
+  ]
+ },
+ {
+  "era": "室町",
+  "icon": "⚔️",
+  "color": "#2c3e8c",
+  "units": [
+   {
+    "id": "muromachi",
+    "title": "鎌倉幕府の滅亡（建武の新政〜室町幕府の成立）",
+    "sub": "室町時代",
+    "study": "muromachi.html",
+    "quiz": "muromachi_quiz.html",
+    "test": "muromachi_test.html"
+   },
+   {
+    "id": "muromachi2",
+    "title": "南北朝・足利義満",
+    "sub": "室町時代",
+    "study": "muromachi2.html",
+    "quiz": "muromachi2_quiz.html",
+    "test": "muromachi2_test.html"
+   },
+   {
+    "id": "muromachi3",
+    "title": "応仁の乱と戦国時代",
+    "sub": "室町時代",
+    "study": "muromachi3.html",
+    "quiz": "muromachi3_quiz.html",
+    "test": "muromachi3_test.html"
+   },
+   {
+    "id": "muromachi4",
+    "title": "室町文化",
+    "sub": "室町時代（文化）",
+    "study": "muromachi4.html",
+    "quiz": "muromachi4_quiz.html",
+    "test": "muromachi4_test.html"
+   }
+  ]
+ },
+ {
+  "era": "戦国・安土桃山",
+  "icon": "🔥",
+  "color": "#922b21",
+  "units": [
+   {
+    "id": "sen1",
+    "title": "十字軍とルネサンス",
+    "sub": "世界のうごき（中世〜近世のヨーロッパ）",
+    "study": "sengoku1.html",
+    "quiz": "sengoku1_quiz.html",
+    "test": "sengoku1_test.html"
+   },
+   {
+    "id": "sen2",
+    "title": "新航路の発見",
+    "sub": "世界のうごき（大航海時代）",
+    "study": "sengoku2.html",
+    "quiz": "sengoku2_quiz.html",
+    "test": "sengoku2_test.html"
+   },
+   {
+    "id": "sen3",
+    "title": "宗教改革とキリスト教伝来",
+    "sub": "世界のうごき → 日本（戦国時代）",
+    "study": "sengoku3.html",
+    "quiz": "sengoku3_quiz.html",
+    "test": "sengoku3_test.html"
+   },
+   {
+    "id": "sen4",
+    "title": "鉄砲伝来と南蛮貿易",
+    "sub": "戦国時代",
+    "study": "sengoku4.html",
+    "quiz": "sengoku4_quiz.html",
+    "test": "sengoku4_test.html"
+   },
+   {
+    "id": "sen5",
+    "title": "織田信長の統一",
+    "sub": "安土桃山時代①",
+    "study": "sengoku5.html",
+    "quiz": "sengoku5_quiz.html",
+    "test": "sengoku5_test.html"
+   },
+   {
+    "id": "sen6",
+    "title": "豊臣秀吉の統一",
+    "sub": "安土桃山時代②",
+    "study": "sengoku6.html",
+    "quiz": "sengoku6_quiz.html",
+    "test": "sengoku6_test.html"
+   },
+   {
+    "id": "sen7",
+    "title": "桃山文化",
+    "sub": "安土桃山時代③（文化）",
+    "study": "sengoku7.html",
+    "quiz": "sengoku7_quiz.html",
+    "test": "sengoku7_test.html"
+   }
+  ]
+ },
+ {
+  "era": "江戸",
+  "icon": "🗾",
+  "color": "#1a5276",
+  "units": [
+   {
+    "id": "edo1",
+    "title": "幕府の成立と支配",
+    "sub": "江戸時代",
+    "study": "edo1.html",
+    "quiz": "edo1_quiz.html",
+    "test": "edo1_test.html"
+   },
+   {
+    "id": "edo2",
+    "title": "鎖国と外交",
+    "sub": "江戸時代",
+    "study": "edo2.html",
+    "quiz": "edo2_quiz.html",
+    "test": "edo2_test.html"
+   },
+   {
+    "id": "edo3",
+    "title": "産業と身分制度",
+    "sub": "江戸時代",
+    "study": "edo3.html",
+    "quiz": "edo3_quiz.html",
+    "test": "edo3_test.html"
+   },
+   {
+    "id": "edo4",
+    "title": "元禄文化と享保・田沼・寛政の改革",
+    "sub": "江戸時代",
+    "study": "edo4.html",
+    "quiz": "edo4_quiz.html",
+    "test": "edo4_test.html"
+   },
+   {
+    "id": "edo5",
+    "title": "化政文化と新しい学問・天保の改革と幕府の衰え",
+    "sub": "江戸時代",
+    "study": "edo5.html",
+    "quiz": "edo5_quiz.html",
+    "test": "edo5_test.html"
+   }
+  ]
+ },
+ {
+  "era": "欧米と幕末・明治",
+  "icon": "🚢",
+  "color": "#5b3a8c",
+  "units": [
+   {
+    "id": "ch15",
+    "title": "欧米の歴史と開国①（絶対王政・市民革命）",
+    "sub": "近世〜近代の欧米",
+    "study": "ch15.html",
+    "quiz": "ch15_quiz.html",
+    "test": "ch15_test.html"
+   },
+   {
+    "id": "ch16",
+    "title": "欧米の歴史と開国②（産業革命・列強のアジア進出）",
+    "sub": "近世〜近代の欧米",
+    "study": "ch16.html",
+    "quiz": "ch16_quiz.html",
+    "test": "ch16_test.html"
+   },
+   {
+    "id": "kindai10",
+    "title": "フランス第二帝政・第三共和政",
+    "sub": "幕末・明治",
+    "study": "kindai10.html",
+    "quiz": "kindai10_quiz.html",
+    "test": "kindai10_test.html"
+   },
+   {
+    "id": "ch17",
+    "title": "開国",
+    "sub": "幕末・明治",
+    "study": "ch17.html",
+    "quiz": "ch17_quiz.html",
+    "test": "ch17_test.html"
+   },
+   {
+    "id": "ch18",
+    "title": "江戸幕府の滅亡",
+    "sub": "幕末・明治",
+    "study": "ch18.html",
+    "quiz": "ch18_quiz.html",
+    "test": "ch18_test.html"
+   },
+   {
+    "id": "ch19",
+    "title": "明治維新",
+    "sub": "幕末・明治",
+    "study": "ch19.html",
+    "quiz": "ch19_quiz.html",
+    "test": "ch19_test.html"
+   },
+   {
+    "id": "ch20",
+    "title": "日清・日露戦争",
+    "sub": "明治時代",
+    "study": "ch20.html",
+    "quiz": "ch20_quiz.html",
+    "test": "ch20_test.html"
+   },
+   {
+    "id": "meiji_bunka",
+    "title": "明治の文化",
+    "sub": "明治時代（文化）",
+    "study": "meiji_bunka.html",
+    "quiz": "meiji_bunka_quiz.html",
+    "test": "meiji_bunka_test.html"
+   }
+  ]
+ },
+ {
+  "era": "大正・昭和・現代",
+  "icon": "🌏",
+  "color": "#2e6b4f",
+  "units": [
+   {
+    "id": "rekishi21",
+    "title": "第1次世界大戦",
+    "sub": "大正時代",
+    "study": "rekishi21.html",
+    "quiz": "rekishi21_quiz.html",
+    "test": "rekishi21_test.html"
+   },
+   {
+    "id": "rekishi22",
+    "title": "大正デモクラシーと大衆文化",
+    "sub": "大正時代",
+    "study": "rekishi22.html",
+    "quiz": "rekishi22_quiz.html",
+    "test": "rekishi22_test.html"
+   },
+   {
+    "id": "rekishi23",
+    "title": "世界恐慌と日本の中国侵略",
+    "sub": "昭和時代①（戦前）",
+    "study": "rekishi23.html",
+    "quiz": "rekishi23_quiz.html",
+    "test": "rekishi23_test.html"
+   },
+   {
+    "id": "rekishi24",
+    "title": "第二次世界大戦",
+    "sub": "昭和時代②（戦時）",
+    "study": "rekishi24.html",
+    "quiz": "rekishi24_quiz.html",
+    "test": "rekishi24_test.html"
+   },
+   {
+    "id": "rekishi25",
+    "title": "第二次世界大戦後の日本と世界①",
+    "sub": "戦後①（占領と戦後改革・冷戦の始まり）",
+    "study": "rekishi25.html",
+    "quiz": "rekishi25_quiz.html",
+    "test": "rekishi25_test.html"
+   },
+   {
+    "id": "rekishi26",
+    "title": "第二次世界大戦後の日本と世界②",
+    "sub": "戦後②（独立回復から現代）",
+    "study": "rekishi26.html",
+    "quiz": "rekishi26_quiz.html",
+    "test": "rekishi26_test.html"
+   }
+  ]
+ }
+]];
+
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem('gamba_progress') || '{}'); } catch(e) { return {}; }
+}
+
+function renderUnits() {
+  const prog = getProgress();
+  const container = document.getElementById('unit-list');
+  container.innerHTML = '';
+  let totalUnits = 0, doneUnits = 0;
+
+  UNITS.forEach(era => {
+    const block = document.createElement('div');
+    block.className = 'era-block';
+    block.innerHTML = `
+      <div class="era-title" style="background:${era.color}">
+        <span class="era-icon">${era.icon}</span>
+        ${era.era}
+      </div>
+      <div class="unit-grid" id="grid-${era.era}"></div>
+    `;
+    container.appendChild(block);
+    const grid = block.querySelector('.unit-grid');
+
+    era.units.forEach(unit => {
+      totalUnits++;
+      const p = prog[unit.id] || {};
+      const studyDone = p.studyDone;
+      const testScore = p.testScore;
+      if (studyDone) doneUnits++;
+
+      const card = document.createElement('div');
+      const testPass = testScore !== undefined && testScore >= 70;
+      card.className = 'unit-card' + (studyDone ? ' done' : '') + (testPass ? ' test-done' : '');
+      card.innerHTML = `
+        <div class="badge-area">
+          ${studyDone ? '<span class="badge badge-done">✓ 学習済</span>' : ''}
+          ${testScore !== undefined ? `<span class="badge badge-test ${testScore >= 70 ? 'badge-score' : ''}">${testScore >= 70 ? '🌸 ' : ''}テスト ${testScore}点</span>` : ''}
+        </div>
+        <div class="unit-title">${unit.title}</div>
+        <div class="unit-sub">${unit.sub}</div>
+        <div class="unit-actions">
+          <button class="btn-small btn-study" onclick="location.href='${unit.study}'">📖 学習</button>
+          <button class="btn-small btn-quiz" onclick="location.href='${unit.quiz}'">✏️ 確認問題</button>
+          <button class="btn-small btn-test" onclick="location.href='${unit.test}'">🎯 テスト</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  });
+
+  const pct = totalUnits > 0 ? Math.round(doneUnits / totalUnits * 100) : 0;
+  document.getElementById('progress-text').textContent = `${doneUnits} / ${totalUnits} 単元完了`;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+renderUnits();
+
+// 他ページから戻ってきたとき再描画
+window.addEventListener('focus', renderUnits);
+</script>
+</body>
+</html>
